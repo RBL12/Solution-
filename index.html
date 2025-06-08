@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Zynovatech</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      background: linear-gradient(to right, #000428, #004e92);
+      color: #fff;
+    }
+    header {
+      background-color: #001f3f;
+      padding: 20px;
+      text-align: center;
+    }
+    header h1 {
+      margin: 0;
+      font-size: 2.5rem;
+    }
+    .slider {
+      width: 100%;
+      overflow: hidden;
+      position: relative;
+    }
+    .slider img {
+      width: 100%;
+      animation: slide 12s infinite;
+    }
+    @keyframes slide {
+      0% { transform: translateX(0); }
+      33% { transform: translateX(-100%); }
+      66% { transform: translateX(-200%); }
+      100% { transform: translateX(0); }
+    }
+    section {
+      padding: 40px;
+      text-align: center;
+    }
+    .contact {
+      background-color: #003366;
+      padding: 20px;
+      text-align: center;
+    }
+    .chatbot-icon {
+      position: fixed;
+      bottom: 90px;
+      right: 20px;
+      background: #00b4d8;
+      color: #fff;
+      padding: 15px;
+      border-radius: 50%;
+      cursor: pointer;
+      font-size: 20px;
+      box-shadow: 0 0 10px #00b4d8;
+      z-index: 1000;
+    }
+    .chatbox {
+      position: fixed;
+      bottom: 150px;
+      right: 20px;
+      width: 280px;
+      height: 350px;
+      background: #001d3d;
+      color: white;
+      border-radius: 15px;
+      box-shadow: 0 0 10px #00b4d8;
+      display: none;
+      flex-direction: column;
+      z-index: 999;
+    }
+    .chatbox header {
+      background: #00b4d8;
+      padding: 10px;
+      border-radius: 15px 15px 0 0;
+      text-align: center;
+      font-weight: bold;
+    }
+    .chatbox .messages {
+      flex: 1;
+      padding: 10px;
+      overflow-y: auto;
+      font-size: 0.9rem;
+    }
+    .chatbox input {
+      padding: 10px;
+      border: none;
+      border-radius: 0 0 0 15px;
+      width: 80%;
+    }
+    .chatbox button {
+      width: 20%;
+      background: #00ffff;
+      border: none;
+      color: #000;
+      font-weight: bold;
+      border-radius: 0 0 15px 0;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>Welcome to Zynovatech</h1>
+  </header>
+  <div class="slider">
+    <img src="https://source.unsplash.com/1600x500/?technology" alt="Slide 1" />
+  </div>
+  <section>
+    <h2>Our Services</h2>
+    <p>We provide next-level digital solutions to boost your business.</p>
+  </section>
+  <div class="contact">
+    <h3>Contact Us</h3>
+    <p>Email: contactzynovatech@gmail.com</p>
+    <p>Phone: 7259967924</p>
+    <p>Address: Bangalore</p>
+  </div>
+  <div class="chatbot-icon" onclick="toggleChat()">💬</div>
+  <div class="chatbox" id="chatbox">
+    <header>Chat with Zynovatech</header>
+    <div class="messages" id="chat-messages">
+      <div>👋 Hello! How can I help you today?</div>
+    </div>
+    <div style="display:flex;">
+      <input type="text" id="chat-input" placeholder="Type message...">
+      <button onclick="sendMessage()">➤</button>
+    </div>
+  </div>
+  <script>
+    function toggleChat() {
+      const chatbox = document.getElementById("chatbox");
+      chatbox.style.display = chatbox.style.display === "flex" ? "none" : "flex";
+    }
+    async function sendMessage() {
+      const input = document.getElementById("chat-input");
+      const messages = document.getElementById("chat-messages");
+
+      if (input.value.trim() !== "") {
+        const userMsg = document.createElement("div");
+        userMsg.innerHTML = "🧑‍💻 " + input.value;
+        messages.appendChild(userMsg);
+
+        const loadingMsg = document.createElement("div");
+        loadingMsg.innerHTML = "🤖 Thinking...";
+        messages.appendChild(loadingMsg);
+
+        const response = await fetch("/.netlify/functions/chatgpt-proxy", {
+          method: "POST",
+          body: JSON.stringify({ message: input.value })
+        });
+
+        const data = await response.json();
+        loadingMsg.remove();
+
+        const botMsg = document.createElement("div");
+        botMsg.innerHTML = "🤖 " + (data.choices?.[0]?.message?.content || "Sorry, I didn’t get that.");
+        messages.appendChild(botMsg);
+
+        input.value = "";
+        messages.scrollTop = messages.scrollHeight;
+      }
+    }
+  </script>
+</body>
+</html>
